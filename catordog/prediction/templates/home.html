@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="jp">
+<head>
+  <meta charset="UTF-8">
+  <title>画像表示アプリ</title>
+</head>
+<body> 
+<h2>画像の結果を表示します</h2>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <!-- <form method="post" enctype="multipart/form-data"></form> -->
+  <img id="img_data" type="hidden" name="img_data" />
+  <img id="preview" style="display: none;" />
+  <br>
+  <button type="submit">判定</button>
+</form>
+{% if prediction %}
+  <div id="prediction">
+    <h2 class="mb-4">判定結果</h2>
+    <p>あなたのアップロードした画像の判定結果は以下の通りです。</p>
+    <img src="{{ img_data }}" class="img-fluid mb-3"> 
+    <table class="table">
+      <thead>
+        <tr>
+          <th>カテゴリ</th>
+          <th>確率</th>
+        </tr>
+      </thead>
+      {% for item in prediction %}
+      <tr>
+        <td>{{ item.1 }}</td>
+        <td>{{ item.2 }}% </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endif %}      
+      <!-- <h2>判定結果</h2>
+      <p>あなたのアップロードした画像は「{{ prediction }}」でしょう。</p> -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+  $(function() {
+      $('#id_image').on('change', function() {
+      var reader = new FileReader();
+      reader.onload = function () {
+          $("#preview").attr('src', reader.result);
+          $("#img_data").val(reader.result);
+          $("#preview").show();
+      }
+      reader.readAsDataURL(this.files[0]);
+      $("#prediction").text('');
+      });
+  });
+</script>
+</body>
+</html>
